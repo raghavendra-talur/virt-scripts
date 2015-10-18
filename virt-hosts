@@ -1,5 +1,9 @@
 #!/usr/bin/python
 
+# Original Author : Lars Kellogg-Stedman
+# Source of original script : https://github.com/larsks/virt-utils
+# Modified by : Raghavendra Talur
+
 import os
 import sys
 import argparse
