@@ -1,0 +1,93 @@
+#!/usr/bin/python
+
+import os
+import sys
+import argparse
+import libvirt
+from lxml import etree
+
+#lease_fields = ('time', 'macaddr', 'ipaddr', 'f1', 'f2')
+lease_fields = ('ipaddr', 'hwtype', 'Flags', 'macaddr', 'mask', 'device')
+
+def parse_args():
+    p = argparse.ArgumentParser()
+    p.add_argument('--connect', '-c')
+    p.add_argument('--network', '-N', default='default')
+    p.add_argument('--domain', '-D')
+    p.add_argument('--leases', '-L')
+    p.add_argument('--hosts', '-H')
+    p.add_argument('--short', '-s', action='store_true')
+    p.add_argument('--reload-dnsmasq', '-r', action='store_true')
+    p.add_argument('--update', '-u', action='store_true')
+    return p.parse_args()
+
+def read_leases_file(path):
+    leases = {}
+    with open(path) as fd:
+        for leaseEntry in fd.readlines():
+            lease = dict(zip(lease_fields, leaseEntry.split()))
+            leases[lease['ipaddr']] = lease
+    #for k,v in leases.iteritems():
+    #    print k,v
+
+    return leases
+
+def main():
+    args = parse_args()
+
+    if args.domain is None:
+        args.domain = '%s.virt' % args.network
+
+    if args.leases is None:
+    #    args.leases = '/var/lib/libvirt/dnsmasq/%s.leases' % args.network
+        args.leases = '/proc/net/arp'
+    if args.hosts is None:
+        args.hosts = '/var/lib/libvirt/dnsmasq/%s.addnhosts' % args.network
+
+    assert os.path.exists(args.leases)
+
+    with open(args.hosts, 'w') if args.update else sys.stdout as fd:
+
+        leases = read_leases_file(args.leases)
+
+        con = libvirt.openReadOnly(args.connect)
+        assert con is not None
+
+        for domId in con.listDomainsID():
+            dom = con.lookupByID(domId)
+            desc = etree.fromstring(dom.XMLDesc())
+
+            primary=True
+            for iface in desc.xpath('/domain/devices/interface[@type="network"]'):
+                source = iface.find('source')
+
+                if source.get('network') != args.network:
+                    continue
+
+                macaddr = iface.find('mac').get('address')
+                alias = iface.find('alias').get('name')
+
+                for k,v in leases.iteritems():
+                    #print k,v
+                    if macaddr == v['macaddr']:
+                        ipaddr = k
+                        fd.write('%s\t%s' % (
+                            ipaddr,
+                            '%s-%s.%s' % (dom.name(), alias, args.domain)))
+
+                        if primary:
+                            fd.write(' %s.%s' % (dom.name(), args.domain))
+                            if args.short:
+                                fd.write(' %s' % (dom.name()))
+                        fd.write('\n')
+                        primary=False
+
+    # This is a hack barring a more structured way of getting the
+    # appropriate dnsmasq pid from NetworkManager.
+    if args.reload_dnsmasq:
+        os.system('killall -HUP dnsmasq')
+
+if __name__ == '__main__':
+    main()
+
+
