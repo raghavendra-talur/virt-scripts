@@ -40,7 +40,7 @@ def main():
     args = parse_args()
 
     if args.domain is None:
-        args.domain = '%s.virt' % args.network
+        args.domain = '%s' % args.network
 
     if args.leases is None:
     #    args.leases = '/var/lib/libvirt/dnsmasq/%s.leases' % args.network
@@ -65,7 +65,7 @@ def main():
             for iface in desc.xpath('/domain/devices/interface[@type="network"]'):
                 source = iface.find('source')
 
-                if source.get('network') != args.network:
+                if source.get('network') != args.network and args.network != "all":
                     continue
 
                 macaddr = iface.find('mac').get('address')
@@ -84,7 +84,8 @@ def main():
                             if args.short:
                                 fd.write(' %s' % (dom.name()))
                         fd.write('\n')
-                        primary=False
+                        primary=True
+                        #primary=False
 
     # This is a hack barring a more structured way of getting the
     # appropriate dnsmasq pid from NetworkManager.
