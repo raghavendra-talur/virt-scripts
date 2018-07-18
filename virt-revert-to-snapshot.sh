@@ -1,4 +1,4 @@
-if [[ -z $1 ]]
+if [[ -z $1 || -z $2 ]]
 then
         echo "usage $0 vm_name_pattern snap_name"
         exit 1

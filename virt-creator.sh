@@ -1,14 +1,14 @@
 #!/bin/bash
 
-NNODES=6
-NDISKS=5
+NNODES=3
+NDISKS=8
 DISK_SIZE="500G"
 STORAGE_POOL=${STORAGE_POOL:="/var/lib/libvirt/images"}
-BASE_IMAGE_NAME=${BASE_IMAGE:="rhel-7.5.qcow2"}
-VM_NAMES="cns-3.10.0-cluster1-node"
+BASE_IMAGE_NAME=${BASE_IMAGE:="RHGS-3.3-RHEL-7_vagrant_box_image_0.img"}
+VM_NAMES="rhgs-heketi-node"
 RAM=2048
-NET="cns-3.10.0"
-TLD="cns3100net"
+NET="rastarnet"
+TLD="rastarnet"
 
 
 for i in $(seq 0 ${NNODES})
