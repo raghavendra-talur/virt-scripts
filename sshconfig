@@ -1,0 +1,12 @@
+Host 192.168.*.*
+        CheckHostIp  no
+        StrictHostKeyChecking no
+        UserKnownHostsFile=/dev/null
+        IdentityFile ~/.ssh/vagrant
+
+Host *.NETWORK
+        CheckHostIp  no
+        StrictHostKeyChecking no
+        UserKnownHostsFile=/dev/null
+        IdentityFile ~/.ssh/vagrant
+
