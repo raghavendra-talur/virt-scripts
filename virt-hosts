@@ -23,6 +23,7 @@ def parse_args():
     p.add_argument('--short', '-s', action='store_true')
     p.add_argument('--reload-dnsmasq', '-r', action='store_true')
     p.add_argument('--update', '-u', action='store_true')
+    p.add_argument('--append', '-a', action='store_true')
     return p.parse_args()
 
 def read_leases_file(path):
@@ -49,6 +50,7 @@ def main():
         args.hosts = '/var/lib/libvirt/dnsmasq/%s.addnhosts' % args.network
 
     assert os.path.exists(args.leases)
+
 
     with open(args.hosts, 'w') if args.update else sys.stdout as fd:
 
@@ -83,6 +85,9 @@ def main():
                             fd.write(' %s.%s' % (dom.name(), args.domain))
                             if args.short:
                                 fd.write(' %s' % (dom.name()))
+
+                        fd.write(' %s.%s' % (dom.name(), source.get('network')))
+
                         fd.write('\n')
                         primary=True
                         #primary=False

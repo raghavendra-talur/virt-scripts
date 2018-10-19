@@ -1,3 +1,5 @@
+#!/bin/bash
+
 if [[ -z $1 ]]
 then
         echo "need vm name pattern"

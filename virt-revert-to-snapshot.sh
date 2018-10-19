@@ -8,6 +8,7 @@ snap_name="$2"
 virsh list --name --all | grep "$vm_name_pattern" | while read each;
 do
         echo  domain "$each";
-        virsh snapshot-revert --domain "${each}" --snapshotname "$snap_name" --running
+        echo virsh snapshot-revert --domain "${each}" --snapshotname "$snap_name" --running --force
+        virsh snapshot-revert --domain "${each}" --snapshotname "$snap_name" --running --force
 done
 
