@@ -8,6 +8,10 @@ snap_name="$2"
 virsh list --name --all | grep "$vm_name_pattern" | while read each;
 do
         echo  domain "$each";
-	virsh snapshot-create-as --domain "$each" --atomic --name "$snap_name"
+        if virsh snapshot-list --domain "$each" --name | grep -q -w "$snap_name"
+        then
+                echo "snapshot of given name already exists"
+        else
+                virsh snapshot-create-as --domain "$each" --atomic --name "$snap_name"
+        fi
 done
-

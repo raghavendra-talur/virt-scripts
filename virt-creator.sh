@@ -1,10 +1,10 @@
 #!/bin/bash
 
 NNODES=3
-NDISKS=8
+NDISKS=5
 DISK_SIZE="500G"
 STORAGE_POOL=${STORAGE_POOL:="/var/lib/libvirt/images"}
-BASE_IMAGE_NAME=${BASE_IMAGE:="RHGS-3.3-RHEL-7_vagrant_box_image_0.img"}
+BASE_IMAGE_NAME=${BASE_IMAGE:="rhel-guest-image-7.6-210.x86_64.qcow2"}
 VM_NAMES="rhgs-heketi-node"
 RAM=2048
 NET="rastarnet"
