@@ -12,6 +12,6 @@ do
         then
                 echo "snapshot of given name already exists"
         else
-                virsh snapshot-create-as --domain "$each" --name "$snap_name"
+                virsh snapshot-create-as --domain "$each" --atomic --name "$snap_name"
         fi
 done
