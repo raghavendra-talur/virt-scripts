@@ -7,6 +7,6 @@ vm_name_pattern="$1"
 virsh list --name --all | grep "$vm_name_pattern" | while read each;
 do
         echo  domain "$each";
-	virsh snapshot-list --domain "$each" --name
+	virsh snapshot-list --domain "$each" --tree
 done
 
