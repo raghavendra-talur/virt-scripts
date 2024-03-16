@@ -17,6 +17,8 @@ do
         virsh snapshot-revert --domain "${each}" --snapshotname "$snap_name" --running
 done
 
+sleep 10
+
 virsh list --name --all | grep "$vm_name_pattern" | while read each;
 do
         if minikube profile list | grep $each | grep Running
