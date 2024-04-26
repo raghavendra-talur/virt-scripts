@@ -11,26 +11,26 @@ fi
 vm_name_pattern="$1"
 snap_name="$2"
 
-virsh list --name --all | grep "$vm_name_pattern" | while read each;
+clusters=$(virsh list --name --all | grep "$vm_name_pattern")
+
+for each in $clusters
 do
-        echo  domain "$each";
+        echo  domain "${each}";
         virsh snapshot-revert --domain "${each}" --snapshotname "$snap_name" --running
+        minikube ssh --profile "${each}" -- sudo systemctl restart systemd-timesyncd
+        minikube ssh --profile "${each}" -- date
 done
 
-sleep 10
-
-virsh list --name --all | grep "$vm_name_pattern" | while read each;
+for each in $clusters
 do
-        if minikube profile list | grep $each | grep Running
+        if minikube status --profile "${each}"
         then
-                echo "minikube profile $each is already running"
+                echo "minikube profile "${each}" is already running"
+                minikube ssh --profile "${each}" -- sudo systemctl restart systemd-timesyncd
+                sleep 10
+                minikube ssh --profile "${each}" -- date
         else
-                minikube start --profile "$each"
+                #minikube start --profile "${each}"
+                echo "minikube profile "${each}" is not running"
         fi
 done
-
-echo "current state of the VMs"
-virsh list --all | grep "$vm_name_pattern"
-
-echo "current state of the minikube profiles"
-minikube profile list | grep "$vm_name_pattern"
